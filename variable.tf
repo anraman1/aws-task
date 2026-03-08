@@ -14,6 +14,7 @@ variable "dbs" {
       subnet_name = "private-sub-db1"
       route_table_name = "private-rt-db1"
       az          = "us-east-1a"
+      public_ip     = "false"
     },
     {
       name        = "ec2-app2"
@@ -21,6 +22,7 @@ variable "dbs" {
       subnet_name = "public-sub-app2"
       route_table_name = "public-rt-app2"
       az          = "us-east-1b"
+      public_ip     = "true"
     },
    {
       name        = "ec2-app1"
@@ -28,6 +30,7 @@ variable "dbs" {
       subnet_name = "public-sub-app1"
       route_table_name = "public-rt-app1"
       az          = "us-east-1a"
+      public_ip     = "true"
     }
     
   ]
