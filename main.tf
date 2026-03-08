@@ -32,11 +32,15 @@ resource "aws_instance" "db_instance" {
   instance_type     = var.instance_type
   subnet_id         = aws_subnet.db_subnet[each.key].id
   availability_zone = each.value["az"]
+  associate_public_ip_address = each.value["public_ip"]
 
   tags = {
     Name = each.value["name"]
   }
 }
+
+
+
 
 
 resource "aws_route_table" "route_rt" {
