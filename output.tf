@@ -13,3 +13,8 @@ output "instance_ids" {
     for k, v in aws_instance.db_instance : k => v.id
   }
 }
+
+output "lb_dns_name" {
+  value = aws_lb.app_lb.dns_name
+  
+}
