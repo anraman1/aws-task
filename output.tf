@@ -1,0 +1,15 @@
+output "vpc_id" {
+  value = aws_vpc.icg.id
+}
+
+output "subnet_ids" {
+  value = {
+    for k, v in aws_subnet.db_subnet : k => v.id
+  }
+}
+
+output "instance_ids" {
+  value = {
+    for k, v in aws_instance.db_instance : k => v.id
+  }
+}
