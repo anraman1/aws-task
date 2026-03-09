@@ -124,7 +124,7 @@ resource "aws_launch_template" "app_lt" {
   image_id      = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
 
-  vpc_security_group_ids = [aws_security_group.app_sg.id]
+  vpc_security_group_ids = [aws_security_group.lb_sg.id]
 
   user_data = base64encode(file("install.sh"))
 
@@ -197,5 +197,6 @@ resource "aws_lb_listener" "app_listener" {
     target_group_arn = aws_lb_target_group.app_tg.arn
   }
 }
+
 
 
