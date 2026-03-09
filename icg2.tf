@@ -1,5 +1,5 @@
 
-resource "aws_vpc" "icg" {
+resource "aws_vpc" "icg-2" {
   cidr_block = "192.168.0.0/16"
 
   tags = {
@@ -7,7 +7,7 @@ resource "aws_vpc" "icg" {
   }
 }
 
-resource "aws_subnet" "db_subnet" {
+resource "aws_subnet" "db_subnet-2" {
 
   for_each = {
     for db in var.dbs : db["name"] => db
@@ -41,7 +41,7 @@ resource "aws_subnet" "db_subnet" {
 # }
 
 
-resource "aws_autoscaling_group" "app_asg" {
+resource "aws_autoscaling_group" "app_asg-2" {
   desired_capacity = 2
   max_size         = 6
   min_size         = 2
@@ -62,7 +62,7 @@ resource "aws_autoscaling_group" "app_asg" {
 }
 
 
-resource "aws_route_table" "route_rt" {
+resource "aws_route_table" "route_rt-2" {
 
   for_each = {
     for db in var.dbs : db["name"] => db
@@ -75,7 +75,7 @@ resource "aws_route_table" "route_rt" {
   }
 }
 
-resource "aws_route_table_association" "route_rt_assoc" {
+resource "aws_route_table_association" "route_rt_assoc-2" {
 
   for_each = {
     for db in var.dbs : db["name"] => db
@@ -85,15 +85,15 @@ resource "aws_route_table_association" "route_rt_assoc" {
   route_table_id = aws_route_table.route_rt[each.key].id
 }
 
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.icg.id
+resource "aws_internet_gateway" "igw-2" {
+  vpc_id = aws_vpc.icg-2.id
 
   tags = {
     Name = "${var.vpc_name}-igw"
   }
 }
 
-resource "aws_route" "public_route" {
+resource "aws_route" "public_route-2" {
     # add internet gateway route to public route tables
     for_each = {
         for db in var.dbs : db["name"] => db
@@ -119,7 +119,7 @@ resource "aws_route" "public_route" {
 
 # }
 
-resource "aws_launch_template" "app_lt" {
+resource "aws_launch_template" "app_lt-2" {
   name_prefix   = "app-template"
   image_id      = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
@@ -155,7 +155,7 @@ resource "aws_launch_template" "app_lt" {
 }
 
 # create a target group and assing auto=scaling group to it
-resource "aws_lb_target_group" "app_tg" {
+resource "aws_lb_target_group" "app_tg-2" {
   name     = "app-tg"
   port     = 80
   protocol = "HTTP"
@@ -168,10 +168,10 @@ resource "aws_autoscaling_attachment" "asg_attachment" {
 }
 
 # create a target group and a load balancer to distribute traffic to the app instances in the ASG
-resource "aws_security_group" "lb_sg" {
+resource "aws_security_group" "lb_sg-2" {
   name        = "lb-sg"
   description = "Security group for the load balancer"
-  vpc_id      = aws_vpc.icg.id
+  vpc_id      = aws_vpc.icg-2.id
 
   ingress {
     from_port   = 80
@@ -200,19 +200,19 @@ resource "aws_security_group" "lb_sg" {
 }
 
 
-resource "aws_lb" "app_lb" {
+resource "aws_lb" "app_lb-2" {
   name               = "app-lb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.lb_sg.id]
+  security_groups    = [aws_security_group.lb_sg-2.id]
   subnets = [
     aws_subnet.db_subnet["ec2-app1"].id,
     aws_subnet.db_subnet["ec2-app2"].id
   ]
 }
 
-resource "aws_lb_listener" "app_listener" {
-  load_balancer_arn = aws_lb.app_lb.arn
+resource "aws_lb_listener" "app_listener-2" {
+  load_balancer_arn = aws_lb.app_lb-2.arn
   port              = 80
   protocol          = "HTTP"
 
@@ -239,10 +239,10 @@ resource "aws_lb_listener" "app_listener" {
 # }
 
 
-resource "aws_security_group" "app_sg" {
+resource "aws_security_group" "app_sg-2" {
   name        = "app-sg"
   description = "Security group for the app instances"
-  vpc_id      = aws_vpc.icg.id
+  vpc_id      = aws_vpc.icg-2.id
 
   ingress {
     from_port   = 80
