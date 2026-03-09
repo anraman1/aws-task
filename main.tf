@@ -126,6 +126,14 @@ resource "aws_launch_template" "app_lt" {
 
   vpc_security_group_ids = [aws_security_group.lb_sg.id]
 
+   # assign public IP when launching instances 
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.app_sg.id]
+  }
+
+
   user_data = base64encode(<<-EOF
               #!/bin/bash
               yum install -y python3
@@ -223,3 +231,17 @@ resource "aws_lb_listener" "app_listener" {
 #   filename = "install.sh"
   
 # }
+
+
+resource "aws_security_group" "app_sg" {
+  name        = "app-sg"
+  description = "Security group for the app instances"
+  vpc_id      = aws_vpc.icg.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  
+}
