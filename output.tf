@@ -9,8 +9,8 @@ output "subnet_ids" {
 }
 
 output "asg_name" {
-  value =  aws_aws_autoscaling_group.app_asg 
-  
+  value =  {
+     for k, v in aws_autoscaling_group.app_asg : k => v.name 
 }
 
 output "lb_dns_name" {
