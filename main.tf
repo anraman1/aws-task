@@ -126,7 +126,17 @@ resource "aws_launch_template" "app_lt" {
 
   vpc_security_group_ids = [aws_security_group.lb_sg.id]
 
-  user_data = base64encode(file("install.sh"))
+  user_data = base64encode(<<-EOF
+              #!/bin/bash
+              yum install -y python3
+
+              mkdir -p /var/www/html
+              echo "Hello from $(hostname -f)" > /var/www/html/index.html
+
+              cd /var/www/html
+              python3 -m http.server 80 &
+              EOF
+  )
 
   tag_specifications {
     resource_type = "instance"
@@ -199,17 +209,17 @@ resource "aws_lb_listener" "app_listener" {
 }
 
 
-resource "local_file" "install_script" {
-  content = <<-EOT
-            #!/bin/bash
-            yum install -y python3
+# resource "local_file" "install_script" {
+#   content = <<-EOT
+#             #!/bin/bash
+#             yum install -y python3
 
-            mkdir -p /var/www/html
-            echo "Hello from $(hostname -f)" > /var/www/html/index.html
+#             mkdir -p /var/www/html
+#             echo "Hello from $(hostname -f)" > /var/www/html/index.html
 
-            cd /var/www/html
-            python3 -m http.server 80 &
-            EOT
-  filename = "install.sh"
+#             cd /var/www/html
+#             python3 -m http.server 80 &
+#             EOT
+#   filename = "install.sh"
   
-}
+# }
