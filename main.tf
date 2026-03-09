@@ -200,9 +200,15 @@ resource "aws_lb_listener" "app_listener" {
 
 
 resource "local_file" "install_script" {
-  content  = <<-EOT
-              python3 -m http.server 80 &
-              echo "Hello from $(hostname -f)" > /var/www/html/index.html
+  content = <<-EOT
+            #!/bin/bash
+            yum install -y python3
+
+            mkdir -p /var/www/html
+            echo "Hello from $(hostname -f)" > /var/www/html/index.html
+
+            cd /var/www/html
+            python3 -m http.server 80 &
             EOT
   filename = "install.sh"
   
