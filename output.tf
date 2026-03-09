@@ -12,8 +12,6 @@ output "asg_name" {
   value =  {
      for k, v in aws_autoscaling_group.app_asg : k => v.name 
 }
-
-|
 }
 output "lb_dns_name" {
   value = aws_lb.app_lb.dns_name
