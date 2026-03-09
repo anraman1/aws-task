@@ -162,9 +162,9 @@ resource "aws_lb_target_group" "app_tg-2" {
   vpc_id   = aws_vpc.icg.id
 }
 
-resource "aws_autoscaling_attachment" "asg_attachment" {
-  autoscaling_group_name = aws_autoscaling_group.app_asg.name
-  lb_target_group_arn    = aws_lb_target_group.app_tg.arn
+resource "aws_autoscaling_attachment" "asg_attachment-2" {
+  autoscaling_group_name = aws_autoscaling_group.app_asg-2.name
+  lb_target_group_arn    = aws_lb_target_group.app_tg-2.arn
 }
 
 # create a target group and a load balancer to distribute traffic to the app instances in the ASG
