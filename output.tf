@@ -8,9 +8,9 @@ output "subnet_ids" {
   }
 }
 
-output "instance_ids" {
+output "asg_name" {
   value = {
-    for k, v in aws_instance.db_instance : k => v.id
+    for k, v in aws_autoscaling_group.app_asg : k => v.name
   }
 }
 
