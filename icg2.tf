@@ -149,7 +149,7 @@ resource "aws_launch_template" "app_lt-2" {
     resource_type = "instance"
 
     tags = {
-      Name = "app-instance"
+      Name = "app-instance-2"
     }
   }
 }
@@ -169,7 +169,7 @@ resource "aws_autoscaling_attachment" "asg_attachment-2" {
 
 # create a target group and a load balancer to distribute traffic to the app instances in the ASG
 resource "aws_security_group" "lb_sg-2" {
-  name        = "lb-sg"
+  name        = "lb-sg-2"
   description = "Security group for the load balancer"
   vpc_id      = aws_vpc.icg-2.id
 
@@ -241,7 +241,7 @@ resource "aws_lb_listener" "app_listener-2" {
 
 
 resource "aws_security_group" "app_sg-2" {
-  name        = "app-sg"
+  name        = "app-sg-2"
   description = "Security group for the app instances"
   vpc_id      = aws_vpc.icg-2.id
 
