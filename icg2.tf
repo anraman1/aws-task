@@ -47,16 +47,16 @@ resource "aws_autoscaling_group" "app_asg-2" {
   min_size         = 2
 
   vpc_zone_identifier = [
-    aws_subnet.db_subnet["ec2-app1"].id,
-    aws_subnet.db_subnet["ec2-app2"].id
+    aws_subnet.db_subnet-2["ec2-app1"].id,
+    aws_subnet.db_subnet-2["ec2-app2"].id
   ]
 
   launch_template {
-    id      = aws_launch_template.app_lt.id
+    id      = aws_launch_template.app_lt-2.id
     version = "$Latest"
   }
 
-  target_group_arns = [aws_lb_target_group.app_tg.arn]
+  target_group_arns = [aws_lb_target_group.app_tg-2.arn]
 
   health_check_type = "EC2"
 }
@@ -81,8 +81,8 @@ resource "aws_route_table_association" "route_rt_assoc-2" {
     for db in var.dbs : db["name"] => db
   }
 
-  subnet_id      = aws_subnet.db_subnet[each.key].id
-  route_table_id = aws_route_table.route_rt[each.key].id
+  subnet_id      = aws_subnet.db_subnet-2[each.key].id
+  route_table_id = aws_route_table.route_rt-2[each.key].id
 }
 
 resource "aws_internet_gateway" "igw-2" {
@@ -100,9 +100,9 @@ resource "aws_route" "public_route-2" {
          if strcontains(db["route_table_name"], "public")   
     }
 
-    route_table_id         = aws_route_table.route_rt[each.key].id
+    route_table_id         = aws_route_table.route_rt-2[each.key].id
     destination_cidr_block = "0.0.0.0/0"
-    gateway_id             = aws_internet_gateway.igw.id
+    gateway_id             = aws_internet_gateway.igw-2.id
 }
 
 
