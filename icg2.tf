@@ -201,13 +201,13 @@ resource "aws_security_group" "lb_sg-2" {
 
 
 resource "aws_lb" "app_lb-2" {
-  name               = "app-lb"
+  name               = "app-lb-2"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.lb_sg-2.id]
   subnets = [
-    aws_subnet.db_subnet["ec2-app1"].id,
-    aws_subnet.db_subnet["ec2-app2"].id
+    aws_subnet.db_subnet-2["ec2-app1"].id,
+    aws_subnet.db_subnet-2["ec2-app2"].id
   ]
 }
 
@@ -218,7 +218,7 @@ resource "aws_lb_listener" "app_listener-2" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.app_tg.arn
+    target_group_arn = aws_lb_target_group.app_tg-2.arn
   }
 }
 
