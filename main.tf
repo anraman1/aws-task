@@ -31,16 +31,13 @@ resource "aws_instance" "db_instance" {
   ami               = data.aws_ami.amazon_linux.id
   instance_type     = var.instance_type
   subnet_id         = aws_subnet.db_subnet[each.key].id
+  #enable auto-assign public IP for app instances
   availability_zone = each.value["az"]
-  associate_public_ip_address = each.value["public_ip"]
 
   tags = {
     Name = each.value["name"]
   }
 }
-
-
-
 
 
 resource "aws_route_table" "route_rt" {
@@ -85,4 +82,65 @@ resource "aws_route" "public_route" {
     destination_cidr_block = "0.0.0.0/0"
     gateway_id             = aws_internet_gateway.igw.id
 }
+
+
+
+# create a atuo-scaling group 
+resource "aws_autoscaling_group" "app_asg" {
+  name                      = "app-asg"
+  max_size                  = 3
+  min_size                  = 1
+  desired_capacity          = 1
+  vpc_zone_identifier       = [aws_subnet.db_subnet["ec2-app1"].id, aws_subnet.db_subnet["ec2-app2"].id]
+  launch_configuration      = aws_launch_configuration.app_launch_config.name
+  
+
+}
+
+resource "aws_launch_configuration" "app_launch_config" {
+  name          = "app-launch-config"
+  image_id      = data.aws_ami.amazon_linux.id
+  instance_type = var.instance_type
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# create a target group and assing auto=scaling group to it
+resource "aws_lb_target_group" "app_tg" {
+  name     = "app-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.icg.id
+}
+
+resource "aws_autoscaling_attachment" "asg_attachment" {
+  autoscaling_group_name = aws_autoscaling_group.app_asg.name
+  lb_target_group_arn    = aws_lb_target_group.app_tg.arn
+}
+
+# create a target group and a load balancer to distribute traffic to the app instances in the ASG
+resource "aws_lb" "app_lb" {
+  name               = "app-lb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.lb_sg.id]
+  subnets = [
+    aws_subnet.db_subnet["ec2-app1"].id,
+    aws_subnet.db_subnet["ec2-app2"].id
+  ]
+}
+
+resource "aws_lb_listener" "app_listener" {
+  load_balancer_arn = aws_lb.app_lb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app_tg.arn
+  }
+}
+
 
