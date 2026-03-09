@@ -22,21 +22,43 @@ resource "aws_subnet" "db_subnet" {
   }
 }
 
-resource "aws_instance" "db_instance" {
+# resource "aws_instance" "db_instance" {
 
-  for_each = {
-    for db in var.dbs : db["name"] => db
+#   for_each = {
+#     for db in var.dbs : db["name"] => db
+#   }
+#   # use the ASG launch configuration for app instances and create EC2 instances only for dbs
+
+#   ami               = data.aws_ami.amazon_linux.id
+#   instance_type     = var.instance_type
+#   subnet_id         = aws_subnet.db_subnet[each.key].id
+#   #enable auto-assign public IP for app instances
+#   availability_zone = each.value["az"]
+
+#   tags = {
+#     Name = each.value["name"]
+#   }
+# }
+
+
+resource "aws_autoscaling_group" "app_asg" {
+  desired_capacity = 2
+  max_size         = 4
+  min_size         = 1
+
+  vpc_zone_identifier = [
+    aws_subnet.db_subnet["ec2-app1"].id,
+    aws_subnet.db_subnet["ec2-app2"].id
+  ]
+
+  launch_template {
+    id      = aws_launch_template.app_lt.id
+    version = "$Latest"
   }
 
-  ami               = data.aws_ami.amazon_linux.id
-  instance_type     = var.instance_type
-  subnet_id         = aws_subnet.db_subnet[each.key].id
-  #enable auto-assign public IP for app instances
-  availability_zone = each.value["az"]
+  target_group_arns = [aws_lb_target_group.app_tg.arn]
 
-  tags = {
-    Name = each.value["name"]
-  }
+  health_check_type = "EC2"
 }
 
 
@@ -97,13 +119,21 @@ resource "aws_autoscaling_group" "app_asg" {
 
 }
 
-resource "aws_launch_configuration" "app_launch_config" {
-  name          = "app-launch-config"
+resource "aws_launch_template" "app_lt" {
+  name_prefix   = "app-template"
   image_id      = data.aws_ami.amazon_linux.id
-  instance_type = var.instance_type
+  instance_type = "t3.micro"
 
-  lifecycle {
-    create_before_destroy = true
+  vpc_security_group_ids = [aws_security_group.app_sg.id]
+
+  user_data = base64encode(file("install.sh"))
+
+  tag_specifications {
+    resource_type = "instance"
+
+    tags = {
+      Name = "app-instance"
+    }
   }
 }
 
