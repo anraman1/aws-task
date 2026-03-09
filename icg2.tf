@@ -13,7 +13,7 @@ resource "aws_subnet" "db_subnet-2" {
     for db in var.dbs : db["name"] => db
   }
 
-  vpc_id            = aws_vpc.icg.id
+  vpc_id            = aws_vpc.icg-2.id
   cidr_block        = each.value["cidr"]
   availability_zone = each.value["az"]
 
@@ -68,7 +68,7 @@ resource "aws_route_table" "route_rt-2" {
     for db in var.dbs : db["name"] => db
   }
 
-  vpc_id = aws_vpc.icg.id
+  vpc_id = aws_vpc.icg-2.id
 
   tags = {
     Name = each.value["route_table_name"]
@@ -159,7 +159,7 @@ resource "aws_lb_target_group" "app_tg-2" {
   name     = "app-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = aws_vpc.icg.id
+  vpc_id   = aws_vpc.icg-2.id
 }
 
 resource "aws_autoscaling_attachment" "asg_attachment-2" {
