@@ -129,7 +129,7 @@ resource "aws_launch_template" "app_lt-2" {
 
   network_interfaces {
     associate_public_ip_address = true
-    security_groups             = [aws_security_group.app_sg.id]
+    security_groups             = [aws_security_group.app_sg-2.id]
   }
 
 
