@@ -22,3 +22,8 @@ output "lb_dns_name" {
   value = aws_lb.app_lb.dns_name
   
 }
+
+output "lb_dns_name-2" {
+  value = aws_lb.app_lb-2.dns_name
+  
+}

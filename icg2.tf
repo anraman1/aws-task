@@ -124,7 +124,7 @@ resource "aws_launch_template" "app_lt-2" {
   image_id      = data.aws_ami.amazon_linux.id
   instance_type = "t3.micro"
 
-
+  # vpc id
    # assign public IP when launching instances 
 
   network_interfaces {
@@ -156,7 +156,7 @@ resource "aws_launch_template" "app_lt-2" {
 
 # create a target group and assing auto=scaling group to it
 resource "aws_lb_target_group" "app_tg-2" {
-  name     = "app-tg"
+  name     = "app-tg-2"
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.icg-2.id
