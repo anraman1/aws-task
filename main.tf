@@ -108,16 +108,16 @@ resource "aws_route" "public_route" {
 
 
 # create a atuo-scaling group 
-resource "aws_autoscaling_group" "app_asg" {
-  name                      = "app-asg"
-  max_size                  = 3
-  min_size                  = 1
-  desired_capacity          = 1
-  vpc_zone_identifier       = [aws_subnet.db_subnet["ec2-app1"].id, aws_subnet.db_subnet["ec2-app2"].id]
-  launch_configuration      = aws_launch_configuration.app_launch_config.name
+# resource "aws_autoscaling_group" "app_asg" {
+#   name                      = "app-asg"
+#   max_size                  = 3
+#   min_size                  = 1
+#   desired_capacity          = 1
+#   vpc_zone_identifier       = [aws_subnet.db_subnet["ec2-app1"].id, aws_subnet.db_subnet["ec2-app2"].id]
+#   launch_configuration      = aws_launch_configuration.app_launch_config.name
   
 
-}
+# }
 
 resource "aws_launch_template" "app_lt" {
   name_prefix   = "app-template"
